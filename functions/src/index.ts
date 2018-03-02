@@ -30,15 +30,23 @@ export const imageTagger = functions.storage
 
             const docRef  = admin.firestore().collection('photos').doc(docId);
 
-            // Await the cloud vision response
+            // Await the cloud vision response for labels
             const results = await visionClient.labelDetection(imageUri);
 
-            // Map the data to desired format
+            // Await the cloud vision response for text
+            const detectText = await visionClient.textDetection(imageUri);
+
+            // Map the lables data to desired format
             const labels = results[0].labelAnnotations.map(obj => obj.description);
-            const hotdog = labels.includes('hot dog')
 
+            // Map the text data to desired format
+            const imageText = detectText[0].textAnnotations.map(obj => obj.description);
 
-            return docRef.set({ hotdog, labels })
+            //const hotdog = labels.includes('hot dog')
+            const registrationPlate = labels.includes('vehicle registration plate');
+
+            //return docRef.set({ hotdog, labels })
+            return docRef.set({ registrationPlate, labels, imageText })
 
 
 });
