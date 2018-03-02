@@ -31,8 +31,16 @@ exports.imageTagger = functions.storage
     const docRef = admin.firestore().collection('photos').doc(docId);
     // Await the cloud vision response for labels
     const results = yield visionClient.labelDetection(imageUri);
-    // Await the cloud vision response for text
-    const detectText = yield visionClient.textDetection(imageUri);
+    // Await the cloud vision response for text and pass in English and Chinese hints
+    // as an imageContext object
+    const detectText = yield visionClient.textDetection({
+        image: {
+            source: { imageUri }
+        },
+        imageContext: {
+            languageHints: ['en', 'zh']
+        },
+    });
     // Map the lables data to desired format
     const labels = results[0].labelAnnotations.map(obj => obj.description);
     // Map the text data to desired format

@@ -33,8 +33,17 @@ export const imageTagger = functions.storage
             // Await the cloud vision response for labels
             const results = await visionClient.labelDetection(imageUri);
 
-            // Await the cloud vision response for text
-            const detectText = await visionClient.textDetection(imageUri);
+            // Await the cloud vision response for text and pass in English and Chinese hints
+            // as an imageContext object
+
+            const detectText = await visionClient.textDetection({
+              image: {
+                source: { imageUri }
+              },
+              imageContext: {
+                languageHints: ['en', 'zh']
+              },
+          });
 
             // Map the lables data to desired format
             const labels = results[0].labelAnnotations.map(obj => obj.description);
